@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Poppins;
+}
+
+h1{
+  font-size: 2.5rem;
+}
+
+h1, h2, h3 {
+  --tw-font-weight: 600;
+  font-weight: 600;
+}
+
+.custom-h1{
+  font-size: 6rem;
+  line-height: 0.86;
+}
+
+@media (max-width: 64rem) {
+  h1 {
+    font-size: 2.18rem;
+  }
+
+  .custom-h1{
+    font-size: 5rem;
+    line-height: 0.80;
+  }
+
+html {
+  font-size: 14px;
+}
+}
