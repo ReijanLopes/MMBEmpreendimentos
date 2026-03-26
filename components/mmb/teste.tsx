@@ -172,61 +172,58 @@ export default function TesteScrollSections() {
       animateContent(0);
     }, 100);
 
-    const debouncedUp = debounce(() => goToSection(currentSection - 1), 50);
-    const debouncedDown = debounce(() => goToSection(currentSection + 1), 50);
-
     const shouldIgnore = (target: Element | null) => {
-      // Adicione aqui as classes que o seu carrossel usa
-      // Exemplo: 'swiper', 'slick-slider', ou uma classe sua '.no-gsap-scroll'
-      return !!target?.closest(" .swiper, .carousel-container");
+      return !!target?.closest(".swiper, .carousel-container");
     };
 
-    const handleScrollLogic = (self: any) => {
-      // 1. FILTRO DE VETOR: Se o movimento horizontal for maior que o vertical, 
-      // paramos a execução aqui para permitir o scroll do carrossel.
-      if (Math.abs(self.deltaX) > Math.abs(self.deltaY)) return;
 
-      // 2. FILTRO DE ELEMENTO: Se estiver sobre um carrossel (ajuste a classe se necessário)
-      if (self.target?.closest(".no-gsap-scroll, .swiper, .carousel-container")) return;
-
-      // 3. LÓGICA DE DIREÇÃO:
-      // self.deltaY > 0 significa scroll para baixo (avançar)
-      // self.deltaY < 0 significa scroll para cima (voltar)
-      if (self.deltaY > 0) {
-        debouncedDown();
-      } else if (self.deltaY < 0) {
-        debouncedUp();
-      }
-    };
-
-    const handleTouchLogic = (self: any) => {
-      // No Touch, o deltaY é invertido em relação ao mouse wheel
-      if (Math.abs(self.deltaX) > Math.abs(self.deltaY)) return;
-      if (self.target?.closest(".no-gsap-scroll, .swiper, .carousel-container")) return;
-
-      // Touch natural: arrastar para cima (deltaY negativo) desce a página
-      if (self.deltaY < 0) {
-        goToSection(currentSection + 1);
-      } else if (self.deltaY > 0) {
+    const debouncedUp = debounce((self) => {
+      console.log(
+        "debouncedUp",
+        Math.abs(self.deltaX) >= Math.abs(self.deltaY),
+        Math.abs(self.deltaX),
+        Math.abs(self.deltaY),
+      );
+      if (shouldIgnore(self.target)) return;
+      if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+        return;
+      } else {
         goToSection(currentSection - 1);
       }
-    };
+    }, 50);
+    const debouncedDown = debounce((self) => {
+      console.log(
+        "debouncedDown",
+        Math.abs(self.deltaX) >= Math.abs(self.deltaY),
+        Math.abs(self.deltaX),
+        Math.abs(self.deltaY),
+      );
+      if (shouldIgnore(self.target)) return;
+      if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+        return;
+      } else {
+        goToSection(currentSection + 1);
+      }
+    }, 50);
+
 
     // --- 4. OBSERVERS (Tolerância aumentada para Trackpads) ---
     const observer = Observer.create({
       target: containerRef.current,
       type: "wheel",
-      preventDefault: true,
+      preventDefault: false,
       tolerance: 80, // Ignora micro-movimentos do trackpad
-      onChange: handleScrollLogic
+      onUp: (self) => debouncedUp(self), // Mobile pode ser mais sensível
+      onDown: (self) => debouncedDown(self),
     });
 
     const observerTouch = Observer.create({
       target: containerRef.current,
-      type: "touch,pointer",
-      preventDefault: true,
-      tolerance: 10, // Mobile pode ser mais sensível
-      onChange: handleTouchLogic
+      type: "touch",
+      preventDefault: false,
+      tolerance: 40,
+      onUp: (self) => debouncedDown(self), // Mobile pode ser mais sensível
+      onDown: (self) => debouncedUp(self),
     });
 
     return () => {
@@ -248,9 +245,10 @@ export default function TesteScrollSections() {
   return (
     <div
       ref={containerRef}
+      style={{ touchAction: "pan-x pinch-zoom" }}
       className="relative w-full min-h-screen bg-black overflow-hidden"
     >
-      {/* <Menu /> */}
+      <Menu />
       {contents.map((content, idx) => (
         <section
           key={idx}

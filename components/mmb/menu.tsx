@@ -13,10 +13,10 @@ import LogoMMB from "../logo/logo-mmb";
 export default function Menu() {
   return (
     <Section
-      classNameBg="fixed z-50 min-h-screen overflow-hidden"
+      classNameBg="fixed min-h-screen overflow-hidden"
       className={`flex justify-between py-5 lg:py-10 min-h-screen transition-all duration-300 text-white header-text-animation`}
     >
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-10 relative z-20">
         <div className="h-10 w-12.5">
           <LogoMMB className={`w-12 header-fill-animation fill-white`}/>
         </div>

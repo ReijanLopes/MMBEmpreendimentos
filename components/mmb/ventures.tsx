@@ -63,7 +63,7 @@ const projects = [
 ];
 
 export default function Ventures() {
-  const [activeIndex, setActiveIndex] = useState(0); // Guarda o slide atual
+  const [activeIndex, setActiveIndex] = useState(0);
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   return (
     <Section
@@ -74,7 +74,7 @@ export default function Ventures() {
       <Space />
 
       {/* CORREÇÃO: min-w-0 é essencial aqui para o Swiper não "explodir" o Flexbox */}
-      <section className="relative z-10 flex-1 min-w-0 md:px-0">
+      <section className="relative z-50 flex-1 min-w-0 md:px-0">
         <h1 className="text-5xl font-bold text-white mb-8 text-left left-animation">
           Empreendimentos
         </h1>
@@ -236,7 +236,7 @@ export default function Ventures() {
             </SwiperSlide>
           ))}
         </Swiper>
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="flex justify-center gap-2 mt-4 bottom-animation">
         {projects.map((_, index) => (
           <div
             key={index}
