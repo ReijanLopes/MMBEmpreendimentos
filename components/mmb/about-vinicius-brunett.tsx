@@ -3,7 +3,7 @@ import { GridBackground } from "../background/grid-background";
 import Section from "../section";
 import Space from "./space";
 
-import viniciusBrunetti from "@/public/person/vini.png";
+import viniciusBrunetti from "@/public/person/vini.webp";
 
 export default function AboutViniciusBrunetti() {
   return (
@@ -12,7 +12,7 @@ export default function AboutViniciusBrunetti() {
       <Image
         src={viniciusBrunetti}
         alt="Foto do Engenheiro Civil Vinicius Brunetti"
-        className="min-w-150 absolute -bottom-10 inset-0 block z-10 lg:hidden bottom-animation"
+        className="min-w-150 w-full aspect-1336/1796 absolute -bottom-10 inset-0 block z-10 lg:hidden bottom-animation"
       />
 
       <Section
@@ -43,11 +43,16 @@ export default function AboutViniciusBrunetti() {
           </div>
         </section>
         <section className="absolute -right-[10%] xl:-right-[6%] 2xl:right-[10%] -top-30  hidden lg:block right-animation">
+          <div className="w-full h-full relative">
+           
           <Image
             src={viniciusBrunetti}
             alt="Foto do Engenheiro Civil Vinicius Brunetti"
-            className="w-250"
+            className="min-w-250 w-full aspect-1336/1796"
           />
+           <div className="absolute bottom-0 w-full h-20 bg-linear-to-t from-[#002F17] to-transparent"></div>
+          </div>
+          
         </section>
       </Section>
     </section>

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Building2, Calendar, Home, MapPin } from "lucide-react";
 import { GridBackground } from "../background/grid-background";
@@ -13,7 +13,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { useState } from "react";
 
-import type { Swiper as SwiperType } from 'swiper';
+import type { Swiper as SwiperType } from "swiper";
 
 const projects = [
   {
@@ -96,7 +96,7 @@ export default function Ventures() {
               slidesPerView: 3.1,
             },
           }}
-          className="property-swiper w-full pb-12" // pb-12 para dar espaço às bolinhas da paginação
+          className="property-swiper w-full pb-12 pr-4" // pb-12 para dar espaço às bolinhas da paginação
         >
           {projects.map((project) => (
             <SwiperSlide key={project.id} className="h-auto">
@@ -234,18 +234,18 @@ export default function Ventures() {
           ))}
         </Swiper>
         <div className="flex justify-center gap-2 mt-4 bottom-animation md:hidden">
-        {projects.map((_, index) => (
-          <div
-            key={index}
-            onClick={() => swiperInstance?.slideTo(index)} // Vai para o slide ao clicar no dot
-            className={`transition-all duration-300 h-2 rounded-full bg-white ${
-              activeIndex === index 
-                ? "w-8" // Estilo para o dot ATIVO
-                : "w-2"   // Estilo para o dot INATIVO
-            }`}
-          />
-        ))}
-      </div>
+          {projects.map((_, index) => (
+            <div
+              key={index}
+              onClick={() => swiperInstance?.slideTo(index)} // Vai para o slide ao clicar no dot
+              className={`transition-all duration-300 h-2 rounded-full bg-white ${
+                activeIndex === index
+                  ? "w-8" // Estilo para o dot ATIVO
+                  : "w-2" // Estilo para o dot INATIVO
+              }`}
+            />
+          ))}
+        </div>
       </section>
     </Section>
   );

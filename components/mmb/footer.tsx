@@ -9,12 +9,11 @@ import logoCompleta from "@/public/logo-completa.png"
 export default function Footer() {
   return (
     <Section
-      classNameBg="bg-[#002F17] min-h-screen relative"
+      classNameBg="bg-[#002F17] min-h-screen relative z-10"
       className="flex"
     >
       <GridBackground />
-      <Space />
-      <section className="relative z-10">
+      <section className="relative z-50">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-12">
           {/* Left Side */}
           <div>

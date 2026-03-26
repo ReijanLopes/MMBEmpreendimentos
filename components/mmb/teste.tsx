@@ -120,23 +120,47 @@ export default function TesteScrollSections() {
 
     function handleThemeChange(index: number) {
       const isSpecialSection = index === 4;
-      const isFooter = index === 5;
+      const isFooter = index >= 5;
+      const isPartners = index >= 4;
+
       gsap.to(".header-text-animation", {
         color: isSpecialSection ? "#0d3a2e" : "#ffffff",
         duration: 0.4,
         ease: "power2.inOut",
       });
+
       gsap.to(".header-fill-animation", {
         fill: isSpecialSection ? "#0d3a2e" : "#ffffff",
         duration: 0.4,
         ease: "power2.inOut",
       });
 
-      gsap.to(".header-hidden-animation", {
-        duration: 0.4,
-        opacity: isFooter ? 0 : 1,
-        ease: "power2.inOut",
+      gsap.to(".progress", {
+        "--progress": `${(index + 1) * 14.2857}%`,
+        duration: 1.5,
+        ease: "power2.out",
       });
+
+      gsap.to(".progress-bg", {
+        backgroundColor: isPartners ? "#002F17" : "#FFFF" ,
+        duration: 0,
+        ease: "power2.out",
+      });
+
+      if (isFooter) {
+        gsap.to(".header-hidden-animation", {
+          duration: 0,
+          display: "none",
+          ease: "power2.inOut",
+        });
+      } else {
+        gsap.to(".header-hidden-animation", {
+          duration: 0,
+          delay: 0.8,
+          display: "flex",
+          ease: "power2.inOut",
+        });
+      }
     }
 
     function goToSection(index: number) {
@@ -186,7 +210,6 @@ export default function TesteScrollSections() {
       return !!self.target?.closest(".swiper, .carousel-container");
     };
 
-
     const debouncedUp = debounce((self) => {
       if (shouldIgnore(self)) return;
       if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
@@ -203,7 +226,6 @@ export default function TesteScrollSections() {
         goToSection(currentSection + 1);
       }
     }, 50);
-
 
     // --- 4. OBSERVERS (Tolerância aumentada para Trackpads) ---
     const observer = Observer.create({
@@ -222,6 +244,7 @@ export default function TesteScrollSections() {
       preventDefault: false,
       lockAxis: true,
       tolerance: 20,
+
       onUp: (self) => debouncedDown(self), // Mobile pode ser mais sensível
       onDown: (self) => debouncedUp(self),
     });
@@ -249,16 +272,17 @@ export default function TesteScrollSections() {
       style={{ touchAction: "pan-x pinch-zoom" }}
       className="relative w-full min-h-screen overflow-hidden bg-black"
     >
-      <Menu />
       {contents.map((content, idx) => (
         <section
           key={idx}
           style={{ zIndex: contents.length - idx }}
-          className="panel absolute top-0 left-0 w-full h-screen flex items-center justify-center"
+          className={`panel absolute top-0 left-0 w-full h-screen flex items-center justify-center ${idx == 5 ? "flex lg:hidden" : ""}`}
         >
           {content}
         </section>
       ))}
+
+      <Menu />
     </div>
   );
 }
