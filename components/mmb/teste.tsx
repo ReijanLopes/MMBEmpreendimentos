@@ -1,7 +1,8 @@
 "use client";
 
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { Observer } from "gsap/src/Observer";
 
 import AboutViniciusBrunetti from "./about-vinicius-brunett";
 import AboutMMB from "./about-mmb";
@@ -11,8 +12,19 @@ import Partners from "./partners";
 import Footer from "./footer";
 import Menu from "./menu";
 
-import { Observer } from "gsap/src/Observer";
 gsap.registerPlugin(Observer);
+
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+  let timer: ReturnType<typeof setTimeout>;
+
+  return (...args: Parameters<T>) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
 
 export default function TesteScrollSections() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -23,39 +35,57 @@ export default function TesteScrollSections() {
   }, []);
 
   useLayoutEffect(() => {
+    if (!containerRef.current) return;
+
     const panels = gsap.utils.toArray<HTMLElement>(".panel");
     let currentSection = 0;
     let isAnimating = false;
+    let activeContentTl: gsap.core.Timeline | null = null;
 
-    // 1. A timeline base deve ser linear (ease: "none")
+    // VARIÁVEL DE CONTROLE PARA TRACKPAD
+    let lastScrollTime = 0;
+    const scrollDelay = 600; // Tempo em milissegundos para ignorar novos comandos de scroll
+
+    // --- 1. SETUP INICIAL ---
+    gsap.set(
+      ".left-animation, .right-animation, .bottom-animation, .top-animation",
+      {
+        opacity: 0,
+        overwrite: "auto",
+      },
+    );
+    gsap.set(".left-animation", { x: -50 });
+    gsap.set(".right-animation", { x: 50 });
+    gsap.set(".bottom-animation", { y: 50 });
+    gsap.set(".top-animation", { y: -50 });
+
     const tl = gsap.timeline({ paused: true });
     panels.forEach((panel, i) => {
       if (i < panels.length - 1) {
-        // CORREÇÃO: ease removido/setado como "none" aqui
-        tl.to(panel, { yPercent: -100, duration: 0.8, ease: "none" });
+        tl.to(panel, { yPercent: -100, duration: 1, ease: "none" });
       }
     });
 
+    // --- 2. FUNÇÕES DE ANIMAÇÃO ---
+
     function animateContent(index: number) {
       const currentPanel = panels[index];
-
-      // Criamos uma timeline nova para esta seção específica
-      const sectionTl = gsap.timeline();
-
-      // 1. Buscamos todos os elementos que tenham QUALQUER uma das 3 classes
       const elements = currentPanel.querySelectorAll(
         ".left-animation, .right-animation, .bottom-animation, .top-animation",
       );
 
+      if (activeContentTl) activeContentTl.kill();
+
       if (elements.length > 0) {
-        // 2. Animamos todos em uma única sequência
-        sectionTl.to(elements, {
+        activeContentTl = gsap.timeline();
+        activeContentTl.to(elements, {
           x: 0,
           y: 0,
           opacity: 1,
           duration: 0.6,
           ease: "power2.out",
-          stagger: 0.2,
+          stagger: 0.1,
+          overwrite: "auto",
         });
       }
     }
@@ -63,6 +93,10 @@ export default function TesteScrollSections() {
     function resetContent(indexToKeep: number) {
       panels.forEach((panel, i) => {
         if (i !== indexToKeep) {
+          const elements = panel.querySelectorAll(
+            ".left-animation, .right-animation, .bottom-animation, .top-animation",
+          );
+          gsap.killTweensOf(elements);
           gsap.set(panel.querySelectorAll(".left-animation"), {
             x: -50,
             opacity: 0,
@@ -84,77 +118,121 @@ export default function TesteScrollSections() {
     }
 
     function handleThemeChange(index: number) {
-      // A Section 5 corresponde ao índice 4 (Hero=0, About1=1, About2=2, Ventures=3, Partners=4)
-      // Se o seu Footer for a 6ª, ajuste o número conforme a ordem do seu array 'contents'
       const isSpecialSection = index === 4;
-
+      const isFooter = index === 5;
       gsap.to(".header-text-animation", {
         color: isSpecialSection ? "#0d3a2e" : "#ffffff",
-        duration: 0,
+        duration: 0.4,
         ease: "power2.inOut",
       });
-
       gsap.to(".header-fill-animation", {
         fill: isSpecialSection ? "#0d3a2e" : "#ffffff",
-        duration: 0,
+        duration: 0.4,
         ease: "power2.inOut",
       });
 
-      // Dica: Se o seu Menu ou outros elementos fixos precisarem mudar também:
-      // gsap.to(".menu-item", { color: isSpecialSection ? "#fff" : "#000" });
+      gsap.to(".header-hidden-animation", {
+        duration: 0.4,
+        opacity: isFooter ? 0 : 1,
+        ease: "power2.inOut",
+      });
     }
 
     function goToSection(index: number) {
-      if (isAnimating) return;
+      const now = Date.now();
 
-      // Impede que a animação tente rodar se já estivermos na mesma seção
+      // Bloqueia se já estiver animando OU se o tempo desde o último scroll for muito curto
+      if (isAnimating || now - lastScrollTime < scrollDelay) return;
       if (index === currentSection) return;
 
-      index = Math.max(0, Math.min(index, panels.length - 1));
+      const targetIndex = Math.max(0, Math.min(index, panels.length - 1));
+
+      // Atualiza o tempo do último disparo aceito
+      lastScrollTime = now;
       isAnimating = true;
 
-      // 2. O easing real acontece apenas aqui
-      gsap.to(tl, {
-        onStart: () => {
-          handleThemeChange(index);
-        },
-        progress: index / (panels.length - 1),
-        duration: 0.8, // Ajuste a duração ao seu gosto
-        ease: "power3.inOut", // inOut geralmente fica mais natural em scroll hijacking
-        onComplete: () => {
-          currentSection = index;
-          isAnimating = false;
+      handleThemeChange(targetIndex);
 
-          animateContent(index);
-          resetContent(index);
+      gsap.to(tl, {
+        progress: targetIndex / (panels.length - 1),
+        duration: 0.8,
+        ease: "power3.inOut",
+        onComplete: () => {
+          currentSection = targetIndex;
+          isAnimating = false;
+          animateContent(targetIndex);
+          resetContent(targetIndex);
         },
       });
     }
-    handleThemeChange(0);
-    animateContent(0);
-    resetContent(0);
-    // 3. Observer unificado e otimizado
+
+    // --- 3. DISPARO INICIAL ---
+    const timeout = setTimeout(() => {
+      handleThemeChange(0);
+      animateContent(0);
+    }, 100);
+
+    const debouncedUp = debounce(() => goToSection(currentSection - 1), 50);
+    const debouncedDown = debounce(() => goToSection(currentSection + 1), 50);
+
+    const shouldIgnore = (target: Element | null) => {
+      // Adicione aqui as classes que o seu carrossel usa
+      // Exemplo: 'swiper', 'slick-slider', ou uma classe sua '.no-gsap-scroll'
+      return !!target?.closest(" .swiper, .carousel-container");
+    };
+
+    const handleScrollLogic = (self: any) => {
+      // 1. FILTRO DE VETOR: Se o movimento horizontal for maior que o vertical, 
+      // paramos a execução aqui para permitir o scroll do carrossel.
+      if (Math.abs(self.deltaX) > Math.abs(self.deltaY)) return;
+
+      // 2. FILTRO DE ELEMENTO: Se estiver sobre um carrossel (ajuste a classe se necessário)
+      if (self.target?.closest(".no-gsap-scroll, .swiper, .carousel-container")) return;
+
+      // 3. LÓGICA DE DIREÇÃO:
+      // self.deltaY > 0 significa scroll para baixo (avançar)
+      // self.deltaY < 0 significa scroll para cima (voltar)
+      if (self.deltaY > 0) {
+        debouncedDown();
+      } else if (self.deltaY < 0) {
+        debouncedUp();
+      }
+    };
+
+    const handleTouchLogic = (self: any) => {
+      // No Touch, o deltaY é invertido em relação ao mouse wheel
+      if (Math.abs(self.deltaX) > Math.abs(self.deltaY)) return;
+      if (self.target?.closest(".no-gsap-scroll, .swiper, .carousel-container")) return;
+
+      // Touch natural: arrastar para cima (deltaY negativo) desce a página
+      if (self.deltaY < 0) {
+        goToSection(currentSection + 1);
+      } else if (self.deltaY > 0) {
+        goToSection(currentSection - 1);
+      }
+    };
+
+    // --- 4. OBSERVERS (Tolerância aumentada para Trackpads) ---
     const observer = Observer.create({
       target: containerRef.current,
-      type: "wheel", // Lida com mouse, trackpad e mobile de uma vez
+      type: "wheel",
       preventDefault: true,
-      onUp: () => goToSection(currentSection - 1), // Scroll para cima
-      onDown: () => goToSection(currentSection + 1), // Scroll para baixo
-      tolerance: 10, // Adiciona uma pequena tolerância para evitar disparos acidentais
+      tolerance: 80, // Ignora micro-movimentos do trackpad
+      onChange: handleScrollLogic
     });
 
     const observerTouch = Observer.create({
       target: containerRef.current,
-      type: "touch,pointer", // Lida com mouse, trackpad e mobile de uma vez
+      type: "touch,pointer",
       preventDefault: true,
-      onUp: () => goToSection(currentSection + 1), // Scroll para cima
-      onDown: () => goToSection(currentSection - 1), // Scroll para baixo
-      tolerance: 10, // Adiciona uma pequena tolerância para evitar disparos acidentais
+      tolerance: 10, // Mobile pode ser mais sensível
+      onChange: handleTouchLogic
     });
 
     return () => {
       observer.kill();
       observerTouch.kill();
+      clearTimeout(timeout);
     };
   }, []);
 
@@ -166,28 +244,18 @@ export default function TesteScrollSections() {
     <Partners key="partners" />,
     <Footer key="footer" />,
   ];
-  // if (!jsActive) {
-  //   return (
-  //     <Fragment>
-  //       <Menu />
-  //       <Hero key="hero" />
-  //       <AboutViniciusBrunetti key="about1" />
-  //       <AboutMMB key="about2" />
-  //       <Ventures key="ventures" />
-  //       <Partners key="partners" />
-  //       <Footer key="footer" />
-  //     </Fragment>
-  //   );
-  // }
 
   return (
-    <div ref={containerRef} className="relative w-full min-h-screen">
-      <Menu />
+    <div
+      ref={containerRef}
+      className="relative w-full min-h-screen bg-black overflow-hidden"
+    >
+      {/* <Menu /> */}
       {contents.map((content, idx) => (
         <section
           key={idx}
           style={{ zIndex: contents.length - idx }}
-          className={`panel absolute top-0 w-full flex items-center overflow-y-auto justify-center shadow`}
+          className="panel absolute top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden"
         >
           {content}
         </section>

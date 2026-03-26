@@ -22,7 +22,7 @@ export default function AboutViniciusBrunetti() {
 
         <Space />
         <section className="relative z-10 flex flex-col justify-end lg:justify-start">
-          <div className="flex flex-col justify-end lg:justify-start space-y-6">
+          <div className="flex flex-col justify-end pb-10 lg:justify-start space-y-6">
             <div>
               <p className="text-sm font-medium text-white mb-4 left-animation">
                 Engenheiro Fundador

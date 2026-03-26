@@ -4,7 +4,7 @@ import Space from "./space";
 export default function Partners() {
   return (
     <Section
-      classNameBg="bg-white min-h-screen overlay overflow-hidden relative"
+      classNameBg="bg-white min-h-screen overlay overflow-hidden relative z-20"
       className="flex items-center "
     >
       <Space />
