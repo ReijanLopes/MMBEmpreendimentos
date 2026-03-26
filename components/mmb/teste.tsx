@@ -178,12 +178,6 @@ export default function TesteScrollSections() {
 
 
     const debouncedUp = debounce((self) => {
-      console.log(
-        "debouncedUp",
-        Math.abs(self.deltaX) >= Math.abs(self.deltaY),
-        Math.abs(self.deltaX),
-        Math.abs(self.deltaY),
-      );
       if (shouldIgnore(self.target)) return;
       if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
         return;
@@ -192,12 +186,6 @@ export default function TesteScrollSections() {
       }
     }, 50);
     const debouncedDown = debounce((self) => {
-      console.log(
-        "debouncedDown",
-        Math.abs(self.deltaX) >= Math.abs(self.deltaY),
-        Math.abs(self.deltaX),
-        Math.abs(self.deltaY),
-      );
       if (shouldIgnore(self.target)) return;
       if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
         return;
@@ -212,6 +200,7 @@ export default function TesteScrollSections() {
       target: containerRef.current,
       type: "wheel",
       preventDefault: false,
+      lockAxis: true,
       tolerance: 80, // Ignora micro-movimentos do trackpad
       onUp: (self) => debouncedUp(self), // Mobile pode ser mais sensível
       onDown: (self) => debouncedDown(self),
@@ -221,7 +210,8 @@ export default function TesteScrollSections() {
       target: containerRef.current,
       type: "touch",
       preventDefault: false,
-      tolerance: 40,
+      lockAxis: true,
+      tolerance: 20,
       onUp: (self) => debouncedDown(self), // Mobile pode ser mais sensível
       onDown: (self) => debouncedUp(self),
     });
