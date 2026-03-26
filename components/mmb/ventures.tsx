@@ -90,10 +90,7 @@ export default function Ventures() {
           slidesPerView={1.05}
           breakpoints={{
             640: {
-              slidesPerView: 1.2, // Mostra um pedaço do próximo card no mobile
-            },
-            768: {
-              slidesPerView: 2.2,
+              slidesPerView: 2.1, // Mostra um pedaço do próximo card no mobile
             },
             1024: {
               slidesPerView: 3.1,
@@ -236,7 +233,7 @@ export default function Ventures() {
             </SwiperSlide>
           ))}
         </Swiper>
-        <div className="flex justify-center gap-2 mt-4 bottom-animation">
+        <div className="flex justify-center gap-2 mt-4 bottom-animation md:hidden">
         {projects.map((_, index) => (
           <div
             key={index}

@@ -11,6 +11,7 @@ import Ventures from "./ventures";
 import Partners from "./partners";
 import Footer from "./footer";
 import Menu from "./menu";
+import Contact from "./contact";
 
 gsap.registerPlugin(Observer);
 
@@ -172,13 +173,22 @@ export default function TesteScrollSections() {
       animateContent(0);
     }, 100);
 
-    const shouldIgnore = (target: Element | null) => {
-      return !!target?.closest(".swiper, .carousel-container");
+    const shouldIgnore = (self: any) => {
+      const event = self.event; // Pegamos o evento nativo (WheelEvent ou TouchEvent)
+
+      // 1. Bloqueia se for Zoom no Trackpad (pinça envia ctrlKey = true)
+      if (event && event.ctrlKey) return true;
+
+      // 2. Bloqueia se for Zoom no Mobile (gesto com 2 ou mais dedos)
+      if (event && event.touches && event.touches.length > 1) return true;
+
+      // 3. Ignora se o usuário estiver rolando um carrossel horizontal
+      return !!self.target?.closest(".swiper, .carousel-container");
     };
 
 
     const debouncedUp = debounce((self) => {
-      if (shouldIgnore(self.target)) return;
+      if (shouldIgnore(self)) return;
       if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
         return;
       } else {
@@ -186,7 +196,7 @@ export default function TesteScrollSections() {
       }
     }, 50);
     const debouncedDown = debounce((self) => {
-      if (shouldIgnore(self.target)) return;
+      if (shouldIgnore(self)) return;
       if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
         return;
       } else {
@@ -229,6 +239,7 @@ export default function TesteScrollSections() {
     <AboutMMB key="about2" />,
     <Ventures key="ventures" />,
     <Partners key="partners" />,
+    <Contact key="contact" />,
     <Footer key="footer" />,
   ];
 
@@ -236,14 +247,14 @@ export default function TesteScrollSections() {
     <div
       ref={containerRef}
       style={{ touchAction: "pan-x pinch-zoom" }}
-      className="relative w-full min-h-screen bg-black overflow-hidden"
+      className="relative w-full min-h-screen overflow-hidden bg-black"
     >
       <Menu />
       {contents.map((content, idx) => (
         <section
           key={idx}
           style={{ zIndex: contents.length - idx }}
-          className="panel absolute top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden"
+          className="panel absolute top-0 left-0 w-full h-screen flex items-center justify-center"
         >
           {content}
         </section>
