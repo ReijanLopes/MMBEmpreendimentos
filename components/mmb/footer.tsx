@@ -14,7 +14,7 @@ export default function Footer() {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isLoading },
+    formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<ContactSchema>({
     resolver: zodResolver(contactSchema),
     mode: "onChange",
@@ -104,19 +104,19 @@ export default function Footer() {
 
           {/* Right Side - Contact Form */}
           <div className="hidden lg:block">
-            <h2 className="text-2xl font-bold mb-8 text-white bottom-animation">
+            <h2 className="text-2xl font-bold mb-8 text-white ">
               Entre em contato
             </h2>
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="space-y-2 lg:space-y-4 text-[16px]!"
+              className="space-y-2 text-[16px]!"
             >
-              <div className="grid grid-cols-2 gap-2 lg:gap-4">
+              <div className="grid grid-cols-2 gap-2">
                 <input
                   type="text"
                   placeholder="Nome"
                   {...register("name")}
-                  className={`bottom-animation border px-4 text-gray-900 py-3 bg-white rounded-lg ${
+                  className={` border px-4 text-gray-900 py-3 bg-white rounded-lg ${
                     errors.name ? "border-red-500" : ""
                   }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white`}
                 />
@@ -124,7 +124,7 @@ export default function Footer() {
                   type="email"
                   placeholder="Email"
                   {...register("email")}
-                  className={`bottom-animation border px-4 text-gray-900 py-3 bg-white rounded-lg ${
+                  className={` border px-4 text-gray-900 py-3 bg-white rounded-lg ${
                     errors.email ? "border-red-500" : ""
                   }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white`}
                 />
@@ -133,7 +133,7 @@ export default function Footer() {
                 type="text"
                 placeholder="Assunto"
                 {...register("subject")}
-                className={`bottom-animation border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
+                className={` border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
                   errors.subject ? "border-red-500" : ""
                 }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white`}
               />
@@ -141,17 +141,24 @@ export default function Footer() {
                 placeholder="Sua mensagem"
                 rows={6}
                 {...register("message")}
-                className={`bottom-animation border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
+                className={` border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
                   errors.message ? "border-red-500" : ""
                 }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white resize-none`}
               />
               <button
                 type="submit"
-                disabled={isLoading}
-                className={`bottom-animation w-full  text-black ${isLoading ? "bg-gray-300 cursor-progress" : "bg-white"}
-              font-bold py-3 rounded-lg hover:bg-gray-100 transition-colors`}
+                disabled={isSubmitting}
+                className={` w-full text-black ${
+                  isSubmitting
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-white hover:bg-gray-100"
+                } font-bold py-3 rounded-lg transition-colors`}
               >
-                Enviar
+                {isSubmitting
+                  ? isSubmitSuccessful
+                    ? "Enviando..."
+                    : "Enviado com sucesso"
+                  : "Enviar"}
               </button>
             </form>
           </div>

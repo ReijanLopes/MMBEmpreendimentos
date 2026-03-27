@@ -1,11 +1,15 @@
+import Image from "next/image";
 import { GridBackground } from "../background/grid-background";
 import Section from "../section";
 import Space from "./space";
+
+import floorPlanBuilding from "@/public/mmb/bg/bg-planta-base.png"
 
 export default function AboutMMB() {
   return (
     <Section classNameBg="bg-[#002F17] min-h-screen overflow-hidden relative" className="flex">
       <GridBackground />
+      <Image alt="Planta baixa" src={floorPlanBuilding} className="absolute hidden -right-[70%] rotate-5  lg:block"/>
       <Space />
       <section className="relative z-10">
         <div className="max-w-2xl">

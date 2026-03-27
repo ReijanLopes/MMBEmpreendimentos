@@ -100,7 +100,7 @@ export default function Contact() {
                 : "bg-white hover:bg-gray-100"
             } font-bold py-3 rounded-lg transition-colors`}
           >
-            {isSubmitting ? "Enviando..." : "Enviar"}
+            {isSubmitting ? isSubmitSuccessful ? "Enviando..." : "Enviado com sucesso" : "Enviar"}
           </button>
         </form>
       </section>
