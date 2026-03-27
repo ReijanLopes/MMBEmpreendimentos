@@ -16,6 +16,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Poppins;
+  -webkit-overflow-scrolling: touch; /* Melhora a inércia, mas aqui queremos controle total */
+  touch-action: none;
 }
 
 h1{
@@ -49,6 +51,12 @@ html {
 
 .left-animation{
   opacity: 0;
+}
+
+.panel {
+  will-change: transform; /* Avisa ao navegador para colocar a seção em uma camada da GPU */
+  backface-visibility: hidden;
+  transform: translateZ(0); /* Força aceleração 3D */
 }
 
 

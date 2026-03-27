@@ -1,12 +1,50 @@
 import { Instagram, MapPin, Phone } from "lucide-react";
 import { GridBackground } from "../background/grid-background";
 import Section from "../section";
-import Space from "./space";
 import Image from "next/image";
 
-import logoCompleta from "@/public/logo-completa.png"
+import logoCompleta from "@/public/logo-completa.png";
+import { useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { contactSchema, ContactSchema } from "@/schemas/contactSchema";
 
 export default function Footer() {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isLoading },
+  } = useForm<ContactSchema>({
+    resolver: zodResolver(contactSchema),
+    mode: "onChange",
+  });
+
+  async function onSubmit(data: ContactSchema) {
+    try {
+      const response = await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error(result);
+        alert("Erro ao enviar mensagem");
+        return;
+      }
+
+      reset();
+    } catch (error) {
+      console.error(error);
+      alert("Erro inesperado");
+    }
+  }
+
   return (
     <Section
       classNameBg="bg-[#002F17] min-h-screen relative z-10"
@@ -19,7 +57,7 @@ export default function Footer() {
           <div>
             <div className="mb-8">
               <div className="w-48 aspect-220/122 rounded-lg mb-6 flex items-center justify-center">
-                <Image src={logoCompleta} alt="Logo completa"/>
+                <Image src={logoCompleta} alt="Logo completa" />
               </div>
             </div>
 
@@ -28,7 +66,7 @@ export default function Footer() {
               padrão. Mais de 15 anos de experiência na construção civil,
               entregando qualidade, pontualidade e transparência em cada
               projeto.
-            </p> 
+            </p>
 
             <div className="space-y-6">
               <div className="flex items-start gap-4">
@@ -36,7 +74,8 @@ export default function Footer() {
                 <div>
                   <p className="text-white">Endereço</p>
                   <p className="text-sm font-semibold text-gray-200">
-                    R. Agnelo Guimarães, 326 - Três Barras, Linhares - ES, 29907-030
+                    R. Agnelo Guimarães, 326 - Três Barras, Linhares - ES,
+                    29907-030
                   </p>
                 </div>
               </div>
@@ -45,7 +84,9 @@ export default function Footer() {
                 <Phone className="w-5 h-5 shrink-0 mt-1 text-white" />
                 <div>
                   <p className="text-white">Telefone</p>
-                  <p className="text-sm text-gray-200 font-semibold">(27) 99999-9999</p>
+                  <p className="text-sm text-gray-200 font-semibold">
+                    (27) 99999-9999
+                  </p>
                 </div>
               </div>
 
@@ -53,7 +94,9 @@ export default function Footer() {
                 <Instagram className="w-5 h-5 shrink-0 mt-1 text-white" />
                 <div>
                   <p className="text-white">Media social</p>
-                  <p className="text-sm text-gray-200 font-semibold">@mmbempreendimentos</p>
+                  <p className="text-sm text-gray-200 font-semibold">
+                    @mmbempreendimentos
+                  </p>
                 </div>
               </div>
             </div>
@@ -61,37 +104,54 @@ export default function Footer() {
 
           {/* Right Side - Contact Form */}
           <div className="hidden lg:block">
-            <h3 className="text-2xl font-bold mb-8 text-white">
+            <h2 className="text-2xl font-bold mb-8 text-white bottom-animation">
               Entre em contato
-            </h3>
-            <form className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            </h2>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-2 lg:space-y-4 text-[16px]!"
+            >
+              <div className="grid grid-cols-2 gap-2 lg:gap-4">
                 <input
                   type="text"
                   placeholder="Nome"
-                  className="px-4 py-3 bg-white rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+                  {...register("name")}
+                  className={`bottom-animation border px-4 text-gray-900 py-3 bg-white rounded-lg ${
+                    errors.name ? "border-red-500" : ""
+                  }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white`}
                 />
                 <input
                   type="email"
                   placeholder="Email"
-                  className="px-4 py-3 bg-white rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+                  {...register("email")}
+                  className={`bottom-animation border px-4 text-gray-900 py-3 bg-white rounded-lg ${
+                    errors.email ? "border-red-500" : ""
+                  }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white`}
                 />
               </div>
               <input
                 type="text"
                 placeholder="Assunto"
-                className="w-full px-4 py-3 bg-white rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+                {...register("subject")}
+                className={`bottom-animation border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
+                  errors.subject ? "border-red-500" : ""
+                }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white`}
               />
               <textarea
                 placeholder="Sua mensagem"
                 rows={6}
-                className="w-full px-4 py-3 bg-white rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white resize-none"
+                {...register("message")}
+                className={`bottom-animation border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
+                  errors.message ? "border-red-500" : ""
+                }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white resize-none`}
               />
               <button
                 type="submit"
-                className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                disabled={isLoading}
+                className={`bottom-animation w-full  text-black ${isLoading ? "bg-gray-300 cursor-progress" : "bg-white"}
+              font-bold py-3 rounded-lg hover:bg-gray-100 transition-colors`}
               >
-                Entrar em contato
+                Enviar
               </button>
             </form>
           </div>

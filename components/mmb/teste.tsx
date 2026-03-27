@@ -12,6 +12,7 @@ import Partners from "./partners";
 import Footer from "./footer";
 import Menu from "./menu";
 import Contact from "./contact";
+import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(Observer);
 
@@ -35,226 +36,262 @@ export default function TesteScrollSections() {
     setJsActive(true);
   }, []);
 
-  useLayoutEffect(() => {
-    if (!containerRef.current) return;
+  useGSAP(
+    () => {
+      // Use um requestAnimationFrame para garantir que o browser terminou o layout
+      const timer = requestAnimationFrame(() => {
+        if (!containerRef.current) return;
 
-    const panels = gsap.utils.toArray<HTMLElement>(".panel");
-    let currentSection = 0;
-    let isAnimating = false;
-    let activeContentTl: gsap.core.Timeline | null = null;
+        const panels = gsap.utils.toArray<HTMLElement>(".panel");
+        let currentSection = 0;
+        let isAnimating = false;
+        let activeContentTl: gsap.core.Timeline | null = null;
 
-    // VARIÁVEL DE CONTROLE PARA TRACKPAD
-    let lastScrollTime = 0;
-    const scrollDelay = 600; // Tempo em milissegundos para ignorar novos comandos de scroll
+        // VARIÁVEL DE CONTROLE PARA TRACKPAD
+        let lastScrollTime = 0;
+        const scrollDelay = 600; // Tempo em milissegundos para ignorar novos comandos de scroll
 
-    // --- 1. SETUP INICIAL ---
-    gsap.set(
-      ".left-animation, .right-animation, .bottom-animation, .top-animation",
-      {
-        opacity: 0,
-        overwrite: "auto",
-      },
-    );
-    gsap.set(".left-animation", { x: -50 });
-    gsap.set(".right-animation", { x: 50 });
-    gsap.set(".bottom-animation", { y: 50 });
-    gsap.set(".top-animation", { y: -50 });
+        // --- 1. SETUP INICIAL ---
+        gsap.set(
+          ".left-animation, .right-animation, .bottom-animation, .top-animation",
+          {
+            opacity: 0,
+            overwrite: "auto",
+          },
+        );
+        gsap.set(".left-animation", { x: -50 });
+        gsap.set(".right-animation", { x: 50 });
+        gsap.set(".bottom-animation", { y: 50 });
+        gsap.set(".top-animation", { y: -50 });
 
-    const tl = gsap.timeline({ paused: true });
-    panels.forEach((panel, i) => {
-      if (i < panels.length - 1) {
-        tl.to(panel, { yPercent: -100, duration: 1, ease: "none" });
-      }
-    });
-
-    // --- 2. FUNÇÕES DE ANIMAÇÃO ---
-
-    function animateContent(index: number) {
-      const currentPanel = panels[index];
-      const elements = currentPanel.querySelectorAll(
-        ".left-animation, .right-animation, .bottom-animation, .top-animation",
-      );
-
-      if (activeContentTl) activeContentTl.kill();
-
-      if (elements.length > 0) {
-        activeContentTl = gsap.timeline();
-        activeContentTl.to(elements, {
-          x: 0,
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          ease: "power2.out",
-          stagger: 0.1,
-          overwrite: "auto",
+        const tl = gsap.timeline({ paused: true });
+        panels.forEach((panel, i) => {
+          if (i < panels.length - 1) {
+            tl.to(panel, { yPercent: -100, duration: 1, ease: "none" });
+          }
         });
-      }
-    }
 
-    function resetContent(indexToKeep: number) {
-      panels.forEach((panel, i) => {
-        if (i !== indexToKeep) {
-          const elements = panel.querySelectorAll(
+        // --- 2. FUNÇÕES DE ANIMAÇÃO ---
+
+        function animateContent(index: number) {
+          const currentPanel = panels[index];
+          const elements = currentPanel.querySelectorAll(
             ".left-animation, .right-animation, .bottom-animation, .top-animation",
           );
-          gsap.killTweensOf(elements);
-          gsap.set(panel.querySelectorAll(".left-animation"), {
-            x: -50,
-            opacity: 0,
-          });
-          gsap.set(panel.querySelectorAll(".right-animation"), {
-            x: 50,
-            opacity: 0,
-          });
-          gsap.set(panel.querySelectorAll(".bottom-animation"), {
-            y: 50,
-            opacity: 0,
-          });
-          gsap.set(panel.querySelectorAll(".top-animation"), {
-            y: -50,
-            opacity: 0,
+
+          if (activeContentTl) activeContentTl.kill();
+
+          if (elements.length > 0) {
+            activeContentTl = gsap.timeline();
+            activeContentTl.to(elements, {
+              x: 0,
+              y: 0,
+              opacity: 1,
+              duration: 0.4,
+              ease: "power2.out",
+              stagger: 0.1,
+              overwrite: "auto",
+            });
+          }
+        }
+
+        function resetContent(indexToKeep: number) {
+          panels.forEach((panel, i) => {
+            if (i !== indexToKeep) {
+              const elements = panel.querySelectorAll(
+                ".left-animation, .right-animation, .bottom-animation, .top-animation",
+              );
+              gsap.killTweensOf(elements);
+              gsap.set(panel.querySelectorAll(".left-animation"), {
+                x: -50,
+                opacity: 0,
+                force3D: true
+              });
+              gsap.set(panel.querySelectorAll(".right-animation"), {
+                x: 50,
+                opacity: 0,
+                force3D: true
+              });
+              gsap.set(panel.querySelectorAll(".bottom-animation"), {
+                y: 50,
+                opacity: 0,
+                force3D: true
+              });
+              gsap.set(panel.querySelectorAll(".top-animation"), {
+                y: -50,
+                opacity: 0,
+                force3D: true
+              });
+            }
           });
         }
-      });
-    }
 
-    function handleThemeChange(index: number) {
-      const isSpecialSection = index === 4;
-      const isFooter = index >= 5;
-      const isPartners = index >= 4;
+        function handleThemeChange(index: number) {
+          const isSpecialSection = index === 4;
+          const isFooter = index >= 5;
+          const isPartners = index >= 4;
 
-      gsap.to(".header-text-animation", {
-        color: isSpecialSection ? "#0d3a2e" : "#ffffff",
-        duration: 0.4,
-        ease: "power2.inOut",
-      });
+          gsap.to(".header-text-animation", {
+            color: isSpecialSection ? "#0d3a2e" : "#ffffff",
+            duration: 0.4,
+            ease: "power2.inOut",
+          });
 
-      gsap.to(".header-fill-animation", {
-        fill: isSpecialSection ? "#0d3a2e" : "#ffffff",
-        duration: 0.4,
-        ease: "power2.inOut",
-      });
+          gsap.to(".header-fill-animation", {
+            fill: isSpecialSection ? "#0d3a2e" : "#ffffff",
+            duration: 0.4,
+            ease: "power2.inOut",
+          });
 
-      gsap.to(".progress", {
-        "--progress": `${(index + 1) * 14.2857}%`,
-        duration: 1.5,
-        ease: "power2.out",
-      });
+          gsap.to(".progress", {
+            "--progress": `${(index + 1) * 14.2857}%`,
+            duration: 1.5,
+            ease: "power2.out",
+            force3D: true,
+          });
 
-      gsap.to(".progress-bg", {
-        backgroundColor: isPartners ? "#002F17" : "#FFFF" ,
-        duration: 0,
-        ease: "power2.out",
-      });
+          gsap.to(".progress-bg", {
+            backgroundColor: isPartners ? "#002F17" : "#FFFF",
+            ease: "power2.out",
+          });
 
-      if (isFooter) {
-        gsap.to(".header-hidden-animation", {
-          duration: 0,
-          display: "none",
-          ease: "power2.inOut",
+          if (isFooter) {
+            gsap.to(".header-hidden-animation", {
+              duration: 0.2,
+              autoAlpha: 0,
+              display: "none",
+              ease: "power2.inOut",
+            });
+          } else {
+            gsap.to(".header-hidden-animation", {
+              duration: 0.2,
+              delay: 0.6,
+              autoAlpha: 1,
+              display: "flex",
+              ease: "power2.inOut",
+            });
+          }
+        }
+
+        function goToSection(index: number) {
+          const now = Date.now();
+
+          // Bloqueia se já estiver animando OU se o tempo desde o último scroll for muito curto
+          if (isAnimating || now - lastScrollTime < scrollDelay) return;
+          if (index === currentSection) return;
+
+          const targetIndex = Math.max(0, Math.min(index, panels.length - 1));
+
+          // Atualiza o tempo do último disparo aceito
+          lastScrollTime = now;
+          isAnimating = true;
+
+          handleThemeChange(targetIndex);
+
+          gsap.to(tl, {
+            progress: targetIndex / (panels.length - 1),
+            duration: 0.5,
+            ease: "power3.inOut",
+            onComplete: () => {
+              currentSection = targetIndex;
+              isAnimating = false;
+              animateContent(targetIndex);
+              resetContent(targetIndex);
+            },
+          });
+        }
+
+        // --- 3. DISPARO INICIAL ---
+        const timeout = setTimeout(() => {
+          handleThemeChange(0);
+          animateContent(0);
+        }, 100);
+
+        const shouldIgnore = (self: any) => {
+          const event = self.event; // Pegamos o evento nativo (WheelEvent ou TouchEvent)
+
+          // 1. Bloqueia se for Zoom no Trackpad (pinça envia ctrlKey = true)
+          if (event && event.ctrlKey) return true;
+
+          // 2. Bloqueia se for Zoom no Mobile (gesto com 2 ou mais dedos)
+          if (event && event.touches && event.touches.length > 1) return true;
+
+          // 3. Ignora se o usuário estiver rolando um carrossel horizontal
+          return !!self.target?.closest(".swiper, .carousel-container");
+        };
+
+        const debouncedUp = debounce((self: globalThis.Observer) => {
+          if (shouldIgnore(self)) return;
+          if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+            return;
+          } else {
+            goToSection(currentSection - 1);
+          }
+        }, 50);
+        const debouncedDown = debounce((self: globalThis.Observer) => {
+          if (shouldIgnore(self)) return;
+          if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+            return;
+          } else {
+            goToSection(currentSection + 1);
+          }
+        }, 50);
+
+        const handleScrollMobileDown = (self: globalThis.Observer) => {
+          if (shouldIgnore(self)) return;
+          if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+            return;
+          } else {
+            goToSection(currentSection + 1);
+          }
+        };
+
+                const handleScrollMobileUp = (self: globalThis.Observer) => {
+          if (shouldIgnore(self)) return;
+          if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+            return;
+          } else {
+            goToSection(currentSection - 1);
+          }
+        };
+
+        // --- 4. OBSERVERS (Tolerância aumentada para Trackpads) ---
+        const observer = Observer.create({
+          target: containerRef.current,
+          type: "wheel",
+          preventDefault: true,
+          lockAxis: true,
+          tolerance: 80, // Ignora micro-movimentos do trackpad
+          onUp: (self) => debouncedUp(self), // Mobile pode ser mais sensível
+          onDown: (self) => debouncedDown(self),
         });
-      } else {
-        gsap.to(".header-hidden-animation", {
-          duration: 0,
-          delay: 0.8,
-          display: "flex",
-          ease: "power2.inOut",
+
+        const observerTouch = Observer.create({
+          target: containerRef.current,
+          type: "touch",
+          preventDefault: false,
+          lockAxis: true,
+          tolerance: 10,
+          onUp: (self) => handleScrollMobileDown(self), // Mobile pode ser mais sensível
+          onDown: (self) => handleScrollMobileUp(self),
         });
-      }
-    }
 
-    function goToSection(index: number) {
-      const now = Date.now();
-
-      // Bloqueia se já estiver animando OU se o tempo desde o último scroll for muito curto
-      if (isAnimating || now - lastScrollTime < scrollDelay) return;
-      if (index === currentSection) return;
-
-      const targetIndex = Math.max(0, Math.min(index, panels.length - 1));
-
-      // Atualiza o tempo do último disparo aceito
-      lastScrollTime = now;
-      isAnimating = true;
-
-      handleThemeChange(targetIndex);
-
-      gsap.to(tl, {
-        progress: targetIndex / (panels.length - 1),
-        duration: 0.8,
-        ease: "power3.inOut",
-        onComplete: () => {
-          currentSection = targetIndex;
-          isAnimating = false;
-          animateContent(targetIndex);
-          resetContent(targetIndex);
-        },
+        return () => {
+          observer.kill();
+          observerTouch.kill();
+          clearTimeout(timeout);
+        };
       });
-    }
 
-    // --- 3. DISPARO INICIAL ---
-    const timeout = setTimeout(() => {
-      handleThemeChange(0);
-      animateContent(0);
-    }, 100);
+      return () => cancelAnimationFrame(timer);
+    },
+    { scope: containerRef },
+  );
 
-    const shouldIgnore = (self: any) => {
-      const event = self.event; // Pegamos o evento nativo (WheelEvent ou TouchEvent)
+  // useLayoutEffect(() => {
+  //   if (!containerRef.current) return;
 
-      // 1. Bloqueia se for Zoom no Trackpad (pinça envia ctrlKey = true)
-      if (event && event.ctrlKey) return true;
-
-      // 2. Bloqueia se for Zoom no Mobile (gesto com 2 ou mais dedos)
-      if (event && event.touches && event.touches.length > 1) return true;
-
-      // 3. Ignora se o usuário estiver rolando um carrossel horizontal
-      return !!self.target?.closest(".swiper, .carousel-container");
-    };
-
-    const debouncedUp = debounce((self) => {
-      if (shouldIgnore(self)) return;
-      if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
-        return;
-      } else {
-        goToSection(currentSection - 1);
-      }
-    }, 50);
-    const debouncedDown = debounce((self) => {
-      if (shouldIgnore(self)) return;
-      if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
-        return;
-      } else {
-        goToSection(currentSection + 1);
-      }
-    }, 50);
-
-    // --- 4. OBSERVERS (Tolerância aumentada para Trackpads) ---
-    const observer = Observer.create({
-      target: containerRef.current,
-      type: "wheel",
-      preventDefault: false,
-      lockAxis: true,
-      tolerance: 80, // Ignora micro-movimentos do trackpad
-      onUp: (self) => debouncedUp(self), // Mobile pode ser mais sensível
-      onDown: (self) => debouncedDown(self),
-    });
-
-    const observerTouch = Observer.create({
-      target: containerRef.current,
-      type: "touch",
-      preventDefault: false,
-      lockAxis: true,
-      tolerance: 20,
-
-      onUp: (self) => debouncedDown(self), // Mobile pode ser mais sensível
-      onDown: (self) => debouncedUp(self),
-    });
-
-    return () => {
-      observer.kill();
-      observerTouch.kill();
-      clearTimeout(timeout);
-    };
-  }, []);
+  // }, []);
 
   const contents = [
     <Hero key="hero" />,

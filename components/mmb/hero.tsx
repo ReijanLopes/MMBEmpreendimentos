@@ -19,7 +19,7 @@ export default function Hero() {
         className="flex h-screen"
       >
         <Space />
-        <section className="flex items-end relative z-10 pb-32">
+        <section className="flex items-end relative z-10 pb-40">
           <div className="max-w-2xl ">
             {/* Badge */}
             <div className="mb-8 left-animation">

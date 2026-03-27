@@ -24,7 +24,7 @@ const projects = [
     tipo: "Apartamento",
     andares: "18 pavimentos",
     unidades: "120 unidades",
-    entrega: "Dezembro 2027",
+    entrega: "2027/Dez",
     endereco: "Rua das Palmeiras, 1200 — Jardim Europa, São Paulo, SP",
   },
   {
@@ -35,7 +35,7 @@ const projects = [
     tipo: "Apartamento",
     andares: "18 pavimentos",
     unidades: "120 unidades",
-    entrega: "Dezembro 2027",
+    entrega: "2027/Dez",
     endereco: "Rua das Palmeiras, 1200 — Jardim Europa, São Paulo, SP",
   },
   {
@@ -46,7 +46,7 @@ const projects = [
     tipo: "Apartamento",
     andares: "18 pavimentos",
     unidades: "120 unidades",
-    entrega: "Dezembro 2027",
+    entrega: "2027/Dez",
     endereco: "Rua das Palmeiras, 1200 — Jardim Europa, São Paulo, SP",
   },
   {
@@ -57,7 +57,7 @@ const projects = [
     tipo: "Apartamento",
     andares: "18 pavimentos",
     unidades: "120 unidades",
-    entrega: "Dezembro 2027",
+    entrega: "2027/Dez",
     endereco: "Rua das Palmeiras, 1200 — Jardim Europa, São Paulo, SP",
   },
 ];
@@ -104,7 +104,7 @@ export default function Ventures() {
               <div className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col bottom-animation">
                 {/* Image Container */}
 
-                <div className="relative h-60 bg-blue-200 flex items-center justify-center overflow-hidden">
+                <div className="relative h-52 aspect-269/233 bg-blue-200 flex items-center justify-center overflow-hidden">
                   {/* <Image src={project.image} alt={project.title} fill className="object-cover" /> */}
 
                   {/* Home Icon */}
@@ -119,7 +119,7 @@ export default function Ventures() {
                 <div className="p-4 grow flex flex-col">
                   {/* Title */}
 
-                  <div className="mb-6 text-center">
+                  <div className="mb-4 text-center">
                     <h2 className="text-2xl font-bold text-yellow-600 tracking-wider">
                       {project.title}
                     </h2>
