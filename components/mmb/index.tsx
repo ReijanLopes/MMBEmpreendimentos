@@ -1,10 +1,8 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { Observer } from "gsap/src/Observer";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ScrollSmoother } from "gsap/ScrollSmoother";
 
 import AboutViniciusBrunetti from "./about-vinicius-brunett";
 import AboutMMB from "./about-mmb";
@@ -13,108 +11,288 @@ import Ventures from "./ventures";
 import Partners from "./partners";
 import Footer from "./footer";
 import Menu from "./menu";
+import Contact from "./contact";
+import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(Observer, ScrollTrigger, ScrollSmoother);
+gsap.registerPlugin(Observer);
 
-export default function ScrollSections() {
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+  let timer: ReturnType<typeof setTimeout>;
+
+  return (...args: Parameters<T>) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+
+export default function ScrollStackSections() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [jsActive, setJsActive] = useState(false);
 
   useEffect(() => {
     setJsActive(true);
+  }, []);
 
-    const raf = requestAnimationFrame(() => {
-      const ctx = gsap.context(() => {
-        const sections = gsap.utils.toArray<HTMLElement>(".scroll-section");
-        const images = gsap.utils.toArray<HTMLElement>(".scroll-section .bg");
-        const outerWrappers = gsap.utils.toArray<HTMLElement>(
-          ".scroll-section .outer",
+  useGSAP(
+    () => {
+      // Use um requestAnimationFrame para garantir que o browser terminou o layout
+      const timer = requestAnimationFrame(() => {
+        if (!containerRef.current) return;
+
+        const panels = gsap.utils.toArray<HTMLElement>(".panel");
+        let currentSection = 0;
+        let isAnimating = false;
+        let activeContentTl: gsap.core.Timeline | null = null;
+
+        // VARIÁVEL DE CONTROLE PARA TRACKPAD
+        let lastScrollTime = 0;
+        const scrollDelay = 600; // Tempo em milissegundos para ignorar novos comandos de scroll
+
+        // --- 1. SETUP INICIAL ---
+        gsap.set(
+          ".left-animation, .right-animation, .bottom-animation, .top-animation",
+          {
+            opacity: 0,
+            overwrite: "auto",
+          },
         );
-        const innerWrappers = gsap.utils.toArray<HTMLElement>(
-          ".scroll-section .inner",
-        );
+        gsap.set(".left-animation", { x: -50 });
+        gsap.set(".right-animation", { x: 50 });
+        gsap.set(".bottom-animation", { y: 50 });
+        gsap.set(".top-animation", { y: -50 });
 
-        if (!sections.length) return;
-
-        let currentIndex = -1;
-        let animating = false;
-
-        gsap.set(outerWrappers, { yPercent: 100 });
-        gsap.set(innerWrappers, { yPercent: -100 });
-
-        function gotoSection(index: number, direction: number) {
-          if (index < 0 || index >= sections.length) return;
-
-          animating = true;
-
-          const fromTop = direction === -1;
-          const dFactor = fromTop ? -1 : 1;
-
-          const tl = gsap.timeline({
-            defaults: {
-              duration: 2.0,
-              ease: "power1.inOut",
-            },
-            onComplete: () => {
-              animating = false;
-            },
-          });
-
-          if (currentIndex >= 0) {
-            gsap.set(sections[currentIndex], { zIndex: 0 });
+        const tl = gsap.timeline({ paused: true });
+        panels.forEach((panel, i) => {
+          if (i < panels.length - 1) {
+            tl.to(panel, { yPercent: -100, duration: 1, ease: "none" });
           }
-
-          gsap.set(sections[index], {
-            autoAlpha: 1,
-            zIndex: 1,
-          });
-
-          tl.fromTo(
-            [outerWrappers[index], innerWrappers[index]],
-            {
-              yPercent: (i) => (i ? -100 * dFactor : 100 * dFactor),
-            },
-            {
-              yPercent: 0,
-            },
-            0,
-          ).fromTo(
-            images[index],
-            {
-              yPercent: 15 * dFactor,
-            },
-            {
-              yPercent: 0,
-            },
-            0,
-          );
-
-          currentIndex = index;
-        }
-
-        Observer.create({
-          target: containerRef.current,
-          type: "wheel,touch,pointer",
-          wheelSpeed: -1,
-          tolerance: 10,
-          preventDefault: true,
-          // passive: false,
-          onDown: () => {
-            if (!animating) gotoSection(currentIndex - 1, -1);
-          },
-          onUp: () => {
-            if (!animating) gotoSection(currentIndex + 1, 1);
-          },
         });
 
-        gotoSection(0, 1);
-      }, containerRef);
+        // --- 2. FUNÇÕES DE ANIMAÇÃO ---
 
-      return () => ctx.revert();
-    });
+        function animateContent(index: number) {
+          const currentPanel = panels[index];
+          const elements = currentPanel.querySelectorAll(
+            ".left-animation, .right-animation, .bottom-animation, .top-animation",
+          );
 
-    return () => cancelAnimationFrame(raf);
-  }, []);
+          if (activeContentTl) activeContentTl.kill();
+
+          if (elements.length > 0) {
+            activeContentTl = gsap.timeline();
+            activeContentTl.to(elements, {
+              x: 0,
+              y: 0,
+              opacity: 1,
+              duration: 0.3,
+              ease: "power2.out",
+              stagger: 0.1,
+              delay: 0.3,
+              force3D: true,
+              overwrite: "auto",
+            });
+          }
+          
+        }
+
+        function resetContent(indexToKeep: number) {
+          panels.forEach((panel, i) => {
+            if (i !== indexToKeep) {
+              const elements = panel.querySelectorAll(
+                ".left-animation, .right-animation, .bottom-animation, .top-animation",
+              );
+              gsap.killTweensOf(elements);
+              gsap.set(panel.querySelectorAll(".left-animation"), {
+                x: -50,
+                opacity: 0,
+                force3D: true
+              });
+              gsap.set(panel.querySelectorAll(".right-animation"), {
+                x: 50,
+                opacity: 0,
+                force3D: true
+              });
+              gsap.set(panel.querySelectorAll(".bottom-animation"), {
+                y: 50,
+                opacity: 0,
+                force3D: true
+              });
+              gsap.set(panel.querySelectorAll(".top-animation"), {
+                y: -50,
+                opacity: 0,
+                force3D: true
+              });
+            }
+          });
+        }
+
+        function handleThemeChange(index: number) {
+          const isSpecialSection = index === 4;
+          const isFooter = index >= 5;
+          const isPartners = index >= 4;
+
+          gsap.to(".header-text-animation", {
+            color: isSpecialSection ? "#0d3a2e" : "#ffffff",
+            duration: 0.4,
+            ease: "power2.inOut",
+          });
+
+          gsap.to(".header-fill-animation", {
+            fill: isSpecialSection ? "#0d3a2e" : "#ffffff",
+            duration: 0.4,
+            ease: "power2.inOut",
+          });
+
+          gsap.to(".progress", {
+            "--progress": `${(index + 1) * 14.2857}%`,
+            duration: 1.5,
+            ease: "power2.out",
+            force3D: true,
+          });
+
+          gsap.to(".progress-bg", {
+            backgroundColor: isPartners ? "#002F17" : "#FFFF",
+            ease: "power2.out",
+          });
+
+          if (isFooter) {
+            gsap.to(".header-hidden-animation", {
+              duration: 0.2,
+              autoAlpha: 0,
+              display: "none",
+              ease: "power2.inOut",
+            });
+          } else {
+            gsap.to(".header-hidden-animation", {
+              duration: 0.2,
+              delay: 0.6,
+              autoAlpha: 1,
+              display: "flex",
+              ease: "power2.inOut",
+            });
+          }
+        }
+
+        function goToSection(index: number) {
+          const now = Date.now();
+
+          // Bloqueia se já estiver animando OU se o tempo desde o último scroll for muito curto
+          if (isAnimating || now - lastScrollTime < scrollDelay) return;
+          if (index === currentSection) return;
+
+          const targetIndex = Math.max(0, Math.min(index, panels.length - 1));
+
+          // Atualiza o tempo do último disparo aceito
+          lastScrollTime = now;
+          isAnimating = true;
+
+          handleThemeChange(targetIndex);
+
+          gsap.to(tl, {
+            progress: targetIndex / (panels.length - 1),
+            duration: 0.5,
+            ease: "power3.inOut",
+            onStart: () => {
+            animateContent(targetIndex);
+              
+            },
+            onComplete: () => {
+              currentSection = targetIndex;
+              isAnimating = false;
+              resetContent(targetIndex);
+            },
+          });
+        }
+
+        // --- 3. DISPARO INICIAL ---
+        const timeout = setTimeout(() => {
+          handleThemeChange(0);
+          animateContent(0);
+        }, 100);
+
+        const shouldIgnore = (self: any) => {
+          const event = self.event; // Pegamos o evento nativo (WheelEvent ou TouchEvent)
+
+          // 1. Bloqueia se for Zoom no Trackpad (pinça envia ctrlKey = true)
+          if (event && event.ctrlKey) return true;
+
+          // 2. Bloqueia se for Zoom no Mobile (gesto com 2 ou mais dedos)
+          if (event && event.touches && event.touches.length > 1) return true;
+
+          // 3. Ignora se o usuário estiver rolando um carrossel horizontal
+          return !!self.target?.closest(".swiper, .carousel-container");
+        };
+
+        const debouncedUp = debounce((self: globalThis.Observer) => {
+          if (shouldIgnore(self)) return;
+          if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+            return;
+          } else {
+            goToSection(currentSection - 1);
+          }
+        }, 50);
+        const debouncedDown = debounce((self: globalThis.Observer) => {
+          if (shouldIgnore(self)) return;
+          if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+            return;
+          } else {
+            goToSection(currentSection + 1);
+          }
+        }, 50);
+
+        const handleScrollMobileDown = (self: globalThis.Observer) => {
+          if (shouldIgnore(self)) return;
+          if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+            return;
+          } else {
+            goToSection(currentSection + 1);
+          }
+        };
+
+                const handleScrollMobileUp = (self: globalThis.Observer) => {
+          if (shouldIgnore(self)) return;
+          if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
+            return;
+          } else {
+            goToSection(currentSection - 1);
+          }
+        };
+
+        // --- 4. OBSERVERS (Tolerância aumentada para Trackpads) ---
+        const observer = Observer.create({
+          target: containerRef.current,
+          type: "wheel",
+          preventDefault: true,
+          lockAxis: true,
+          tolerance: 80, // Ignora micro-movimentos do trackpad
+          onUp: (self) => debouncedUp(self), // Mobile pode ser mais sensível
+          onDown: (self) => debouncedDown(self),
+        });
+
+        const observerTouch = Observer.create({
+          target: containerRef.current,
+          type: "touch",
+          preventDefault: false,
+          lockAxis: true,
+          tolerance: 10,
+          onUp: (self) => handleScrollMobileDown(self), // Mobile pode ser mais sensível
+          onDown: (self) => handleScrollMobileUp(self),
+        });
+
+        return () => {
+          observer.kill();
+          observerTouch.kill();
+          clearTimeout(timeout);
+        };
+      });
+
+      return () => cancelAnimationFrame(timer);
+    },
+    { scope: containerRef },
+  );
 
   const contents = [
     <Hero key="hero" />,
@@ -122,45 +300,27 @@ export default function ScrollSections() {
     <AboutMMB key="about2" />,
     <Ventures key="ventures" />,
     <Partners key="partners" />,
+    <Contact key="contact" />,
     <Footer key="footer" />,
   ];
-  if (!jsActive) {
-    return (
-      <Fragment>
-        <Menu />
-        <Hero key="hero" />
-        <AboutViniciusBrunetti key="about1" />
-        <AboutMMB key="about2" />
-        <Ventures key="ventures" />
-        <Partners key="partners" />
-        <Footer key="footer" />
-      </Fragment>
-    );
-  }
 
   return (
-    <div ref={containerRef} className="relative h-screen w-full text-white">
-      <Menu />
+    <div
+      ref={containerRef}
+      style={{ touchAction: "pan-x pinch-zoom" }}
+      className="relative w-full min-h-screen overflow-hidden bg-black"
+    >
       {contents.map((content, idx) => (
         <section
           key={idx}
-          className="scroll-section fixed top-0 h-full w-full shadow-xl/30"
+          style={{ zIndex: contents.length - idx }}
+          className={`panel absolute top-0 left-0 w-full h-screen flex items-center justify-center ${idx == 5 ? "flex lg:hidden" : ""}`}
         >
-          <div className="outer h-full w-full overflow-hidden">
-            <div className="inner h-full w-full overflow-hidden">
-              <div
-                className="bg absolute h-full w-full"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(180deg, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.1) 100%)",
-                }}
-              >
-                {content}
-              </div>
-            </div>
-          </div>
+          {content}
         </section>
       ))}
+
+      <Menu />
     </div>
   );
 }

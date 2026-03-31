@@ -1,13 +1,9 @@
-import MMB from "@/components/mmb";
-import Menu from "@/components/mmb/menu";
-import TesteScrollSections from "@/components/mmb/teste";
+import ScrollStackSections from "@/components/mmb";
 
 export default function Home() {
   return (
     <main className="bg-white relative">
-      {/* <Menu /> */}
-      {/* <MMB /> */}
-      <TesteScrollSections />
+      <ScrollStackSections />
     </main>
   );
 }
