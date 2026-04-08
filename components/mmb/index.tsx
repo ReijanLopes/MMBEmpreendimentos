@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { Observer } from "gsap/src/Observer";
 
@@ -67,9 +67,20 @@ export default function ScrollStackSections() {
         const tl = gsap.timeline({ paused: true });
         panels.forEach((panel, i) => {
           if (i < panels.length - 1) {
-            tl.to(panel, { yPercent: -100, duration: 1, ease: "none" });
+            tl.to(panel, { yPercent: -110, duration: 1, ease: "none" });
           }
         });
+
+        const panelElements = panels.map((panel) => ({
+          all: gsap.utils.toArray<HTMLElement>(
+            ".left-animation, .right-animation, .bottom-animation, .top-animation",
+            panel,
+          ),
+          left: gsap.utils.toArray<HTMLElement>(".left-animation", panel),
+          right: gsap.utils.toArray<HTMLElement>(".right-animation", panel),
+          bottom: gsap.utils.toArray<HTMLElement>(".bottom-animation", panel),
+          top: gsap.utils.toArray<HTMLElement>(".top-animation", panel),
+        }));
 
         // --- 2. FUNÇÕES DE ANIMAÇÃO ---
 
@@ -95,7 +106,6 @@ export default function ScrollStackSections() {
               overwrite: "auto",
             });
           }
-          
         }
 
         function resetContent(indexToKeep: number) {
@@ -105,25 +115,21 @@ export default function ScrollStackSections() {
                 ".left-animation, .right-animation, .bottom-animation, .top-animation",
               );
               gsap.killTweensOf(elements);
-              gsap.set(panel.querySelectorAll(".left-animation"), {
+              gsap.set(panelElements[i].left, {
                 x: -50,
                 opacity: 0,
-                force3D: true
               });
-              gsap.set(panel.querySelectorAll(".right-animation"), {
+              gsap.set(panelElements[i].right, {
                 x: 50,
                 opacity: 0,
-                force3D: true
               });
-              gsap.set(panel.querySelectorAll(".bottom-animation"), {
+              gsap.set(panelElements[i].bottom, {
                 y: 50,
                 opacity: 0,
-                force3D: true
               });
-              gsap.set(panel.querySelectorAll(".top-animation"), {
+              gsap.set(panelElements[i].top, {
                 y: -50,
                 opacity: 0,
-                force3D: true
               });
             }
           });
@@ -196,8 +202,7 @@ export default function ScrollStackSections() {
             duration: 0.5,
             ease: "power3.inOut",
             onStart: () => {
-            animateContent(targetIndex);
-              
+              animateContent(targetIndex);
             },
             onComplete: () => {
               currentSection = targetIndex;
@@ -252,7 +257,7 @@ export default function ScrollStackSections() {
           }
         };
 
-                const handleScrollMobileUp = (self: globalThis.Observer) => {
+        const handleScrollMobileUp = (self: globalThis.Observer) => {
           if (shouldIgnore(self)) return;
           if (Math.abs(self.deltaX) >= Math.abs(self.deltaY)) {
             return;
@@ -275,7 +280,7 @@ export default function ScrollStackSections() {
         const observerTouch = Observer.create({
           target: containerRef.current,
           type: "touch",
-          preventDefault: false,
+          preventDefault: true,
           lockAxis: true,
           tolerance: 10,
           onUp: (self) => handleScrollMobileDown(self), // Mobile pode ser mais sensível
@@ -304,23 +309,26 @@ export default function ScrollStackSections() {
     <Footer key="footer" />,
   ];
 
+  const renderContent = useMemo(() => {
+    return contents.map((content, idx) => (
+      <section
+        key={idx}
+        style={{ zIndex: contents.length - idx }}
+        className={`panel absolute top-0 left-0 w-full h-screen flex items-center justify-center shadow-xl/30 ${idx == 5 ? "flex lg:hidden" : ""}`}
+      >
+        {content}
+      </section>
+    ));
+  }, [containerRef.current]);
+
   return (
     <div
       ref={containerRef}
       style={{ touchAction: "pan-x pinch-zoom" }}
-      className="relative w-full min-h-screen overflow-hidden bg-black"
+      className="relative w-full min-h-dvh overflow-hidden bg-black"
     >
-      {contents.map((content, idx) => (
-        <section
-          key={idx}
-          style={{ zIndex: contents.length - idx }}
-          className={`panel absolute top-0 left-0 w-full h-screen flex items-center justify-center ${idx == 5 ? "flex lg:hidden" : ""}`}
-        >
-          {content}
-        </section>
-      ))}
-
-      <Menu />
+      {renderContent}
+      {/* <Menu /> */}
     </div>
   );
 }

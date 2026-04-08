@@ -47,7 +47,7 @@ export default function Contact() {
     <Section classNameBg="bg-[#002F17] min-h-screen relative" className="flex">
       <GridBackground />
       <Space />
-      <section className="relative z-10">
+      <section className="relative z-10 bottom-animation">
         {/* Right Side - Contact Form */}
 
         <h2 className="text-2xl font-bold mb-8 text-white bottom-animation">
@@ -62,7 +62,7 @@ export default function Contact() {
               type="text"
               placeholder="Nome"
               {...register("name")}
-              className={`bottom-animation border px-4 text-gray-900 py-3 bg-white rounded-lg ${
+              className={`border px-4 text-gray-900 py-3 bg-white rounded-lg ${
                 errors.name ? "border-red-500" : ""
               }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white`}
             />
@@ -70,7 +70,7 @@ export default function Contact() {
               type="email"
               placeholder="Email"
               {...register("email")}
-              className={`bottom-animation border px-4 text-gray-900 py-3 bg-white rounded-lg ${
+              className={`border px-4 text-gray-900 py-3 bg-white rounded-lg ${
                 errors.email ? "border-red-500" : ""
               }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white`}
             />
@@ -79,7 +79,7 @@ export default function Contact() {
             type="text"
             placeholder="Assunto"
             {...register("subject")}
-            className={`bottom-animation border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
+            className={`border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
               errors.subject ? "border-red-500" : ""
             }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white`}
           />
@@ -87,14 +87,14 @@ export default function Contact() {
             placeholder="Sua mensagem"
             rows={6}
             {...register("message")}
-            className={`bottom-animation border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
+            className={`border w-full text-gray-900 px-4 py-3 bg-white rounded-lg ${
               errors.message ? "border-red-500" : ""
             }  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white resize-none`}
           />
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`bottom-animation w-full text-black ${
+            className={`w-full text-black ${
               isSubmitting
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-white hover:bg-gray-100"
