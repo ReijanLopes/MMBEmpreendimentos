@@ -15,52 +15,8 @@ import { useState } from "react";
 
 import type { Swiper as SwiperType } from "swiper";
 
-const projects = [
-  {
-    id: 1,
-    image: "/building-1.jpg",
-    title: "THE ONE",
-    subtitle: "RESIDENCE STUDIOS",
-    tipo: "Apartamento",
-    andares: "18 pavimentos",
-    unidades: "120 unidades",
-    entrega: "2027/Dez",
-    endereco: "Rua das Palmeiras, 1200 — Jardim Europa, São Paulo, SP",
-  },
-  {
-    id: 2,
-    image: "/building-2.jpg",
-    title: "THE ONE",
-    subtitle: "RESIDENCE STUDIOS",
-    tipo: "Apartamento",
-    andares: "18 pavimentos",
-    unidades: "120 unidades",
-    entrega: "2027/Dez",
-    endereco: "Rua das Palmeiras, 1200 — Jardim Europa, São Paulo, SP",
-  },
-  {
-    id: 3,
-    image: "/building-3.jpg",
-    title: "THE ONE",
-    subtitle: "RESIDENCE STUDIOS",
-    tipo: "Apartamento",
-    andares: "18 pavimentos",
-    unidades: "120 unidades",
-    entrega: "2027/Dez",
-    endereco: "Rua das Palmeiras, 1200 — Jardim Europa, São Paulo, SP",
-  },
-  {
-    id: 4,
-    image: "/building-3.jpg",
-    title: "THE ONE",
-    subtitle: "RESIDENCE STUDIOS",
-    tipo: "Apartamento",
-    andares: "18 pavimentos",
-    unidades: "120 unidades",
-    entrega: "2027/Dez",
-    endereco: "Rua das Palmeiras, 1200 — Jardim Europa, São Paulo, SP",
-  },
-];
+import content from "@/content/mmb";
+import Image from "next/image";
 
 export default function Ventures() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -76,7 +32,7 @@ export default function Ventures() {
       {/* CORREÇÃO: min-w-0 é essencial aqui para o Swiper não "explodir" o Flexbox */}
       <section className="relative z-50 flex-1 min-w-0 md:px-0">
         <h1 className="text-5xl font-bold text-white mb-8 text-left left-animation">
-          Empreendimentos
+          {content.ventures.title}
         </h1>
 
         {/* Cards Grid */}
@@ -90,27 +46,29 @@ export default function Ventures() {
           slidesPerView={1.05}
           breakpoints={{
             640: {
-              slidesPerView: 2.1, // Mostra um pedaço do próximo card no mobile
+              slidesPerView: 2.05,
+               spaceBetween: 20, // Mostra um pedaço do próximo card no mobile
             },
             1024: {
-              slidesPerView: 3.1,
+              slidesPerView: 3.05,
+              spaceBetween: 20,
             },
           }}
-          className="property-swiper w-full pb-12 pr-4" // pb-12 para dar espaço às bolinhas da paginação
+          className="property-swiper w-full pb-12 pr-4 bottom-animation" // pb-12 para dar espaço às bolinhas da paginação
         >
-          {projects.map((project) => (
+          {content.ventures.projects.map((project) => (
             <SwiperSlide key={project.id} className="h-auto">
               {/* h-full garante que todos os cards tenham a mesma altura */}
-              <div className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col bottom-animation">
+              <div className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col">
                 {/* Image Container */}
 
                 <div className="relative h-52 aspect-269/233 bg-blue-200 flex items-center justify-center overflow-hidden">
-                  {/* <Image src={project.image} alt={project.title} fill className="object-cover" /> */}
+                  <Image src={project.image} alt={""} fill className="object-cover object-top" />
 
                   {/* Home Icon */}
 
-                  <div className="absolute top-4 left-4 bg-yellow-500 bg-opacity-80 rounded-lg p-3 z-10">
-                    <Home className="w-6 h-6 text-amber-700" />
+                  <div className={`absolute top-4 left-4 ${project.logo.bgColor} bg-opacity-80 rounded-lg p-3 z-10`}>
+                   <Image src={project.logo.image} alt={project.logo.alt} width={20} className="aspect-[16.25/19.2]" />
                   </div>
                 </div>
 
@@ -119,14 +77,8 @@ export default function Ventures() {
                 <div className="p-4 grow flex flex-col">
                   {/* Title */}
 
-                  <div className="mb-4 text-center">
-                    <h2 className="text-2xl font-bold text-yellow-600 tracking-wider">
-                      {project.title}
-                    </h2>
-
-                    <p className="text-sm text-yellow-600 tracking-widest mt-1">
-                      {project.subtitle}
-                    </p>
+                  <div className="mb-4 flex items-center justify-center">
+                    <Image src={project.title} alt="" width={132} className="aspect-[132.8/46.4]" />
                   </div>
 
                   {/* Info Grid */}
@@ -223,9 +175,9 @@ export default function Ventures() {
 
                   {/* Button */}
 
-                  <Link href={"/about"}>
+                  <Link href={project.button.link}>
                     <button className="w-full mt-4 bg-linear-to-r from-[#167853] to-[#002F17] hover:bg-emerald-800 text-white font-semibold py-3 px-4 rounded-md transition-colors duration-200">
-                      Conheça o THE ONE
+                      {project.button.label}
                     </button>
                   </Link>
                 </div>
@@ -234,7 +186,7 @@ export default function Ventures() {
           ))}
         </Swiper>
         <div className="flex justify-center gap-2 mt-4 bottom-animation md:hidden">
-          {projects.map((_, index) => (
+          {content.ventures.projects.map((_, index) => (
             <div
               key={index}
               onClick={() => swiperInstance?.slideTo(index)} // Vai para o slide ao clicar no dot

@@ -4,13 +4,15 @@ import Space from "./space";
 
 import imageDefault from "@/public/mmb/bg/image-hero.webp";
 
+import content from "@/content/mmb"
+
 export default function Hero() {
   return (
     <section className="relative bg-[#002F17] w-full min-h-screen">
       <Image
-        src={imageDefault}
+        src={content.hero.imagedefault}
         fill
-        className=" object-cover"
+        className="object-cover object-top"
         loading="lazy"
         alt="Entrega de chaves de imóvel ao cliente"
       />
@@ -24,27 +26,23 @@ export default function Hero() {
             {/* Badge */}
             <div className="mb-8 left-animation">
               <span className="inline-block bg-white text-black text-sm font-semibold px-4 py-2 rounded-[5px]">
-                Construção Civil
+                {content.hero.badge}
               </span>
             </div>
 
             {/* Heading */}
             <div className="mb-8 left-animation">
               <h1 className="text-white text-xl md:text-2xl font-medium mb-2">
-                Realizando
-                {/* <p>Sonhos</p> */}
+                {content.hero.title.line1}
               </h1>
               <h1 className="text-white text-5xl! md:text-6xl! lg:text-7xl! font-bold leading-[0.76]">
-                Sonhos
+                {content.hero.title.line2}
               </h1>
             </div>
 
             {/* Description */}
             <p className="text-white text-base md:text-lg leading-relaxed max-w-lg left-animation">
-              Construímos obras sólidas, seguras e com acabamento de alto
-              padrão. Mais de 15 anos de experiência na construção civil,
-              entregando qualidade, pontualidade e transparência em cada
-              projeto.
+              {content.hero.description}
             </p>
           </div>
         </section>

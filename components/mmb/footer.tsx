@@ -3,11 +3,13 @@ import { GridBackground } from "../background/grid-background";
 import Section from "../section";
 import Image from "next/image";
 
-import logoCompleta from "@/public/logo-completa.png";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contactSchema, ContactSchema } from "@/schemas/contactSchema";
+
+import content from "@/content/mmb";
+import Link from "next/link";
 
 export default function Footer() {
   const {
@@ -57,48 +59,42 @@ export default function Footer() {
           <div>
             <div className="mb-8">
               <div className="w-48 aspect-220/122 rounded-lg mb-6 flex items-center justify-center">
-                <Image src={logoCompleta} alt="Logo completa" />
+                <Image src={content.footer.image} alt="Logo completa" />
               </div>
             </div>
 
             <p className="text-sm leading-relaxed mb-8 text-gray-200">
-              Construímos obras sólidas, seguros e com acabamento de alto
-              padrão. Mais de 15 anos de experiência na construção civil,
-              entregando qualidade, pontualidade e transparência em cada
-              projeto.
+              {content.footer.description}
             </p>
 
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
+            <div className="gap-8 flex flex-col">
+              <Link href={content.footer.address.link}><div className="flex items-start gap-4">
                 <MapPin className="w-5 h-5 shrink-0 mt-1 text-white" />
                 <div>
                   <p className="text-white">Endereço</p>
                   <p className="text-sm font-semibold text-gray-200">
-                    R. Agnelo Guimarães, 326 - Três Barras, Linhares - ES,
-                    29907-030
+                   {content.footer.address.label}
                   </p>
                 </div>
-              </div>
-
-              <div className="flex items-start gap-4">
+              </div></Link>
+              <Link href={content.footer.phone.link}><div className="flex items-start gap-4">
                 <Phone className="w-5 h-5 shrink-0 mt-1 text-white" />
                 <div>
                   <p className="text-white">Telefone</p>
                   <p className="text-sm text-gray-200 font-semibold">
-                    (27) 99999-9999
+                    {content.footer.phone.label}
                   </p>
                 </div>
-              </div>
-
-              <div className="flex items-start gap-4">
+              </div></Link>
+              <Link href={content.footer.social.link}><div className="flex items-start gap-4">
                 <Instagram className="w-5 h-5 shrink-0 mt-1 text-white" />
                 <div>
                   <p className="text-white">Media social</p>
                   <p className="text-sm text-gray-200 font-semibold">
-                    @mmbempreendimentos
+                    {content.footer.social.label}
                   </p>
                 </div>
-              </div>
+              </div></Link>
             </div>
           </div>
 
