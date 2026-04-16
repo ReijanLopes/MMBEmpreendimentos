@@ -37,7 +37,8 @@ export default function CarouselProjects({
             style={{
           '--swiper-navigation-color': '#fff',
           '--swiper-theme-color': '#fff',
-        }}
+        } as React.CSSProperties
+    }
           loop
           autoplay
           slidesPerView={1}
