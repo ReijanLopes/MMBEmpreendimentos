@@ -47,7 +47,7 @@ export default function CarouselProjects({
         >
             {carouselContent?.carousel.map((image, index) => (
                 <SwiperSlide key={index} className="w-full h-full flex items-center justify-center">
-                    <Image src={image} alt={`Imagem ${index + 1}`} className="h-full object-cover rounded-lg" />
+                    <Image loading="eager" unoptimized src={image} alt={`Imagem ${index + 1}`} className="h-full object-cover rounded-lg" />
                 </SwiperSlide>
             ))}
 
