@@ -14,6 +14,8 @@ import Menu from "./menu";
 import Contact from "./contact";
 import { useGSAP } from "@gsap/react";
 
+import CarouselProjects from "./carouselProjects";
+
 gsap.registerPlugin(Observer);
 
 function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
@@ -31,6 +33,7 @@ function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
 export default function ScrollStackSections() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [jsActive, setJsActive] = useState(false);
+  const [open, setOpen] = useState<number | null>(null);
 
   useEffect(() => {
     setJsActive(true);
@@ -303,7 +306,7 @@ export default function ScrollStackSections() {
     <Hero key="hero" />,
     <AboutViniciusBrunetti key="about1" />,
     <AboutMMB key="about2" />,
-    <Ventures key="ventures" />,
+    <Ventures key="ventures" onClick={(id) => setOpen(id)} />,
     <Partners key="partners" />,
     <Contact key="contact" />,
     <Footer key="footer" />,
@@ -321,14 +324,17 @@ export default function ScrollStackSections() {
     ));
   }, [containerRef.current]);
 
+
+
   return (
     <div
       ref={containerRef}
       style={{ touchAction: "pan-x pinch-zoom" }}
-      className="relative w-full min-h-dvh overflow-hidden bg-black"
+      className="relative w-full min-h-dvh bg-black"
     >
       {renderContent}
-      {/* <Menu /> */}
+      <Menu />
+      <CarouselProjects open={open} setOpen={setOpen} />
     </div>
   );
 }
