@@ -14,7 +14,7 @@ export default function AboutViniciusBrunetti() {
         src={content.aboutVinicius.image}
         alt="Foto do Engenheiro Civil Vinicius Brunetti"
         className="min-w-190 w-full absolute aspect-1336/1796 "
-        priority
+        unoptimized
         loading="eager"
       />
         <div className="bottom-0 relative z-10 w-full h-full bg-linear-to-t from-[#002F17] to-transparent"></div>
@@ -52,7 +52,7 @@ export default function AboutViniciusBrunetti() {
             src={content.aboutVinicius.image}
             alt="Foto do Engenheiro Civil Vinicius Brunetti"
             className="min-w-260 w-full aspect-1336/1796"
-            priority
+            unoptimized
             loading="eager"
           />
            <div className="absolute bottom-0 w-full h-40 bg-linear-to-t from-[#002F17] to-transparent"></div>

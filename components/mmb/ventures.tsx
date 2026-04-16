@@ -73,6 +73,7 @@ export default function Ventures({ onClick }: { onClick?: (index: number) => voi
                       src={project.image}
                       alt={""}
                       fill
+                      unoptimized
                       className="object-cover object-top w-full"
                     />
 
@@ -85,6 +86,7 @@ export default function Ventures({ onClick }: { onClick?: (index: number) => voi
                         src={project.logo.image}
                         alt={project.logo.alt}
                         width={20}
+                        unoptimized
                         className="w-5"
                       />
                     </div>
@@ -99,6 +101,7 @@ export default function Ventures({ onClick }: { onClick?: (index: number) => voi
                       <Image
                         src={project.title.url}
                         alt=""
+                        unoptimized
                         className={project.title.className}
                       />
                     </div>
