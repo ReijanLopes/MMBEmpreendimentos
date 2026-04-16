@@ -13,7 +13,6 @@ export default function Hero() {
         src={content.hero.imagedefault}
         fill
         className="object-cover object-top"
-        loading="lazy"
         alt="Entrega de chaves de imóvel ao cliente"
       />
       <Section
