@@ -9,11 +9,12 @@ export default function AboutViniciusBrunetti() {
   return (
     <section className="relative bg-[#002F17] w-full overflow-hidden min-h-screen">
       <GridBackground />
-      <div className="absolute flex justify-end min-w-150 h-screen w-full aspect-1336/1796 lg:hidden bottom-animation">
+      <div className="absolute top-10 flex justify-end min-w-150 h-screen w-full aspect-1336/1796 lg:hidden bottom-animation">
         <Image
         src={content.aboutVinicius.image}
         alt="Foto do Engenheiro Civil Vinicius Brunetti"
-        className="min-w-150 w-full absolute aspect-1336/1796 "
+        className="min-w-190 w-full absolute aspect-1336/1796 "
+        loading="lazy"
       />
         <div className="bottom-0 relative z-10 w-full h-full bg-linear-to-t from-[#002F17] to-transparent"></div>
       </div>
@@ -43,15 +44,16 @@ export default function AboutViniciusBrunetti() {
             </p>
           </div>
         </section>
-        <section className="absolute -right-[10%] xl:-right-[6%] 2xl:right-[10%] -top-30 hidden lg:block right-animation">
+        <section className="absolute -right-[10%] xl:-right-[6%] 2xl:right-[10%] top-10 hidden lg:block right-animation">
           <div className="w-full h-full relative">
            
           <Image
             src={content.aboutVinicius.image}
             alt="Foto do Engenheiro Civil Vinicius Brunetti"
-            className="min-w-250 w-full aspect-1336/1796"
+            className="min-w-260 w-full aspect-1336/1796"
+            loading="lazy"
           />
-           <div className="absolute bottom-0 w-full h-20 bg-linear-to-t from-[#002F17] to-transparent"></div>
+           <div className="absolute bottom-0 w-full h-40 bg-linear-to-t from-[#002F17] to-transparent"></div>
           </div>
           
         </section>

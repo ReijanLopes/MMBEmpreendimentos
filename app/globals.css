@@ -59,4 +59,7 @@ html {
   transform: translateZ(0); /* Força aceleração 3D */
 }
 
-
+.swiper-button-prev, .swiper-button-next{
+  color: black !important;
+  background-color: "white" !important;
+}
